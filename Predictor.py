@@ -37,14 +37,14 @@ def make_predictor(xys, max_deg, tau=None):
       get_weight = lambda target_x: weights
    
    def predict(target_x):
-      target_x = array([[feat] for feat in get_feats(target_x, max_deg)])
+      target_x = array(get_feats(target_x, max_deg))
       weights = get_weight(target_x)
-      return dot(transpose(weights), target_x)[0][0]
+      return dot(transpose(weights), target_x)
 
    return predict
       
 
-
+'''
 ## testing:
 print("For max_deg==3:",
       make_predictor([([0.0], 1.0), ([2.0], 2.0), ([4.0], 3.0), ([6.0], 4.0)],
@@ -52,3 +52,4 @@ print("For max_deg==3:",
 print("For max_deg==4:",
       make_predictor([([0.0], 1.0), ([2.0], 2.0), ([4.0], 3.0), ([6.0], 4.0)],
               max_deg=4)([1.2])) ## --> not 1.6
+'''
