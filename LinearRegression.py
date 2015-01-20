@@ -50,6 +50,9 @@ def make_predictor(xys, max_deg, tau=None, reg_param=0.0):
 print("For max_deg==3:",
       make_predictor([([0.0], 1.0), ([2.0], 2.0), ([4.0], 3.0), ([6.0], 4.0)],
               max_deg=3)([1.2])) ## --> 1.6
+print("For max_deg==3, w/regularization:",
+      make_predictor([([0.0], 1.0), ([2.0], 2.0), ([4.0], 3.0), ([6.0], 4.0)],
+              max_deg=3, reg_param=0.1)([1.2])) ## --> ~1.6, but less.
 print("For max_deg==4:",
       make_predictor([([0.0], 1.0), ([2.0], 2.0), ([4.0], 3.0), ([6.0], 4.0)],
               max_deg=4)([1.2])) ## --> not 1.6
