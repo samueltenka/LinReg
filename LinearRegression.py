@@ -3,6 +3,7 @@
    .............................'''
 ''' Locally-Weighted Polynomial Linear Regression'''
 
+import random
 from numpy.linalg import *
 from numpy import *
 from math import *
@@ -13,7 +14,8 @@ def get_feats(point, max_deg):
 def make_kernel(center, beta):
    def kernel(point):
       diff = point-center
-      return exp(-beta*dot(diff, diff)/2)
+      Z2 = max(-10.0, min(10.0, beta*dot(diff, diff)))
+      return exp(-Z2/2)
    return kernel
    
 def make_predictor(xys, max_deg, tau=None, reg_param=0.0):
@@ -22,6 +24,7 @@ def make_predictor(xys, max_deg, tau=None, reg_param=0.0):
       If tau not specified, ``predict" does global linear regression,
       avoiding the recomputation of ``weights" for each ``target_x".'''
    print("making predictor...", "(max_deg=", max_deg,
+                                ") (tau=", tau,
                                 ") (reg_param=", reg_param, ")")
    xs = array([get_feats(x, max_deg) for (x, y) in xys])
    ys = array([[y] for (x, y) in xys])
@@ -40,6 +43,8 @@ def make_predictor(xys, max_deg, tau=None, reg_param=0.0):
       get_weight = lambda target_x: weights
    
    def predict(target_x):
+      if random.random() < 1E-1:
+         print('.', end='')
       target_x = array(get_feats(target_x, max_deg))
       weights = get_weight(target_x)
       return dot(transpose(weights), target_x)[0]
