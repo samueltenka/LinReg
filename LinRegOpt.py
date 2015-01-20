@@ -6,7 +6,7 @@
 from CSV import get_xys_from, put_xys_to
 from KD_Tree import KD
 from LinearRegression import make_predictor
-from math import sqrt
+from DataNormalizer import Normalizer
       
 def discretize(pred):
    def rounded(x):
@@ -16,36 +16,28 @@ def discretize(pred):
          r = 10.0 if y>0 else -10.0
       return r
    return rounded
-
-def statistics(strain):
-   avg = sum(strain)/len(strain)
-   stddev = sqrt(sum((x-avg)**2 for x in strain))
-   return (avg, stddev)
-def normalize(x, stats):
-   return (x-stats[0])/stats[1]
-def unnormalize(strain, stats):
-   return (x*stats[1])+stats[0]
    
 def make_optimized_predictor(train_xys, max_deg, tau, reg_param):
    xs = [x for (x, y) in train_xys]
-   strains = [[x[i] for x in xs] for i in range(len(xs[0]))]
-   stats = [statistics(strain) for strain in strains]
-   normxs = [[normalize(xi, si) for xi, si in zip(x, stats)] for x in xs]
-   put_xys_to('xkcd.csv', [(x, 0) for x in normxs])
+   N = Normalizer(xs)
+   norm_xs = N.norm_xs
+   norm_xys = [nx+[y] for (nx,(x,y)) in zip(norm_xs, train_xys)]
    
-   K = KD(normxs)
+   K = KD(norm_xys, len(xs[0])) ## so don't allow partitioning by y
 
    ## (epsilon ball volume / scattercloud volume) == #points needed / total #points
    ## radius**dim / sqrt(sum of vars)**dim = degs_freedom / len(xs)
    ## radius**dim / sqrt(dim)**dim = dim*(max_deg+1) / len(xs)
    dim = len(xs[0]) ## == 6
-   radius = sqrt(dim) * (dim*(max_deg+1)/len(xs))**(1.0/dim)
+   radius = (dim**0.5) * (dim*(max_deg+1)/len(xs))**(1.0/dim)
+   #print('radius', radius)
    def optimized(x):
-      neighb_normxs = K.neighbors_of(x, radius)
-      print("len", len(neighb_normxs))
-      pred = make_predictor(neighb_normxs, max_deg, tau ,reg_param)
-      normx = [normalize(xi, si) for xi, si in zip(x, stats)]
-      return discretize(pred(normx))
+      norm_x = N.normalize(x)
+      nbd_norm_xys = K.neighbors_of(norm_x, radius)
+      xys = [(xy[:-1], xy[-1]) for xy in nbd_norm_xys]
+      #print("len", len(xys))
+      pred = make_predictor(xys, max_deg, tau, reg_param)
+      return discretize(pred)(norm_x)
    return optimized
 
 train_xys = get_xys_from('train_graphs_f16_autopilot_cruise.csv')
