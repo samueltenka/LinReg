@@ -22,14 +22,15 @@ class KD:
             (left if c[self.coor]<self.avg else right).append(c)
          self.children = [KD(left), KD(right)]                      
    def neighbors_of(self, point, radius):
+      ''' _open_ ball '''
       if self.is_leaf:
          return [c for c in self.children if distance(c, point)<radius]
       else:
          rtrn = []
          if point[self.coor]-radius < self.avg:
-            rtrn += self.children[0].neighbors_of(point, radius, tabs+1)
+            rtrn += self.children[0].neighbors_of(point, radius)
          if point[self.coor]+radius >= self.avg:
-            rtrn += self.children[1].neighbors_of(point, radius, tabs+1)
+            rtrn += self.children[1].neighbors_of(point, radius)
          return rtrn
    def print(self, tabs=0, is_left=None, coor=None, avg=None):
       print('.'+'...'*tabs, '' if is_left==None else
@@ -44,5 +45,5 @@ class KD:
 
 c = [(1.0, 1.0), (1.1, 1.1), (1.2, 1.2), (1.3, 1.3), (1.4, 1.4), (2.0, 1.0), (3.0, 1.0), (4.0, 1.0), (5.0, 1.0), (6.0, 1.0), (7.0, 1.0), (8.0, 1.0), (9.0, 1.0), (10.0, 1.0), (11.0, 1.0), (12.0, 1.0)]
 K = KD(c)
-K.print()
-print(K.neighbors_of((1.0, 1.0), 1.0))
+#K.print()
+print(K.neighbors_of((1.0, 1.0), 0.5)) ## --> [(1.0, 1.0), (1.1, 1.1), (1.2, 1.2), (1.3, 1.3)]
