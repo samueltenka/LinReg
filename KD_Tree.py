@@ -6,24 +6,38 @@
 import random
 def random_coor():
    return int(random.random()*2.0)
+def distance(p1, p2):
+   return sum(p1[i]*p2[i] for i in range(len(p1)))**0.5
 
 class KD:
-   def __init__(self, children):
+   def __init__(self, children, predicate=lambda x:True, sign=None):
       self.is_leaf = True
       self.children = children
-      self.coor = self.avg = None
+      self.predicate = predicate ## need to and w/all parents' for full strength
       if len(children) > 5:
          self.is_leaf = False
          self.coor = random_coor()
          self.avg = sum(c[self.coor] for c in children)/len(children)
          left = []; right = []
+         left_predicate = lambda x: x[self.coor]<self.avg
+         right_predicate = lambda x: x[self.coor]>=self.avg
          for c in children:
-            (left if c[self.coor]<self.avg else right).append(c)
-         self.children = [KD(left), KD(right)]
-   def branch_of(self, point):
-      return (self.children[0] if point[self.coor]<self.avg else self.children[1])
-   def neighbors_of(self, point):
-      return self.children if self.is_leaf else self.branch_of(point).neighbors_of(point)
+            (left if left_predicate(c) else right).append(c)
+         self.children = [KD(left, left_predicate, -1),
+                          KD(right, right_predicate, +1)]
+   def intersects(self, point, radius, child_sign):
+      return point[self.coor]+radius < self.avg if child_sign==-1 else ## left
+             point[self.coor]+radius >= self.avg                       ## right
+   def neighbors_of(self, point, radius):
+      if self.is_leaf:
+         return [c for c in self.children if distance(c, point)<radius]
+      else:
+         rtrn = []
+         if children[0].intersects(point, radius, -1):
+            rtrn.append(children[0].neighbors_of(point, radius))
+         if children[1].intersects(point, radius, +1):
+            rtrn.append(children[1].neighbors_of(point, radius))
+         return rtrn
    def print(self, tabs=0, is_left=None, coor=None, avg=None):
       print('.'+'...'*tabs, '' if is_left==None else
             'x'+str(coor)+('<' if is_left else '>=')+str(avg)+':')
