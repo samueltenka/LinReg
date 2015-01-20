@@ -23,7 +23,7 @@ class KD:
    def branch_of(self, point):
       return (self.children[0] if point[self.coor]<self.avg else self.children[1])
    def neighbors_of(self, point):
-      return self.children if self.is_leaf else branch_of(point).neighbors_of(point)
+      return self.children if self.is_leaf else self.branch_of(point).neighbors_of(point)
    def print(self, tabs=0, is_left=None, coor=None, avg=None):
       print('.'+'...'*tabs, '' if is_left==None else
             'x'+str(coor)+('<' if is_left else '>=')+str(avg)+':')
@@ -38,3 +38,4 @@ class KD:
 c = [(1.0, 1.0), (1.1, 1.1), (1.2, 1.2), (1.3, 1.3), (1.4, 1.4), (2.0, 1.0), (3.0, 1.0), (4.0, 1.0), (5.0, 1.0), (6.0, 1.0), (7.0, 1.0), (8.0, 1.0), (9.0, 1.0), (10.0, 1.0), (11.0, 1.0), (12.0, 1.0)]
 K = KD(c)
 K.print()
+print(K.neighbors_of((1.0, 1.0)))
