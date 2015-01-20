@@ -9,7 +9,7 @@ from numpy import *
 from math import *
 
 def get_feats(point, max_deg):
-   return [1] + [coor**d for coor in point for d in range(1, max_deg+1)]
+   return [1.0] + [coor**d for coor in point for d in range(1, max_deg+1)]
 
 def make_kernel(center, beta):
    def kernel(point):
