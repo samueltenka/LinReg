@@ -31,7 +31,7 @@ def make_predictor(xys, max_deg, tau=None):
       
    if tau:
       get_weight = lambda target_x: \
-                   compute_weights(make_kernel(target_x, beta=1.0/tau))
+                   compute_weights(make_kernel(target_x, beta=1.0/tau**2))
    else:
       weights = compute_weights(make_kernel(xs[0], beta=0.0))
       get_weight = lambda target_x: weights
