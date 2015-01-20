@@ -21,6 +21,8 @@ def make_predictor(xys, max_deg, tau=None, reg_param=0.0):
       but instead returns ``predict" that eats ``target_x".
       If tau not specified, ``predict" does global linear regression,
       avoiding the recomputation of ``weights" for each ``target_x".'''
+   print("making predictor...", "(max_deg=", max_deg,
+                                ") (reg_param=", reg_param, ")")
    xs = array([get_feats(x, max_deg) for (x, y) in xys])
    ys = array([[y] for (x, y) in xys])
    
@@ -45,10 +47,11 @@ def make_predictor(xys, max_deg, tau=None, reg_param=0.0):
    return predict
       
 
-
+'''
 ## testing:
 xys = [([0.0], 1.0), ([2.0], 2.0), ([4.0], 3.0), ([6.0], 4.0)]
 print("max_deg==3:\t\t 1.6 ~", make_predictor(xys, max_deg=3)([1.2])) ## --> 1.6
 print("max_deg==3 w/ reg.:\t 1.6 ~", make_predictor(xys, max_deg=3, reg_param=1.0)([1.2])) ## --> 1.6
 print("max_deg==4:\t\t 1.6 ~", make_predictor(xys, max_deg=4)([1.2])) ## --> not 1.6
 print("max_deg==4 w/ reg.:\t 1.6 ~", make_predictor(xys, max_deg=4, reg_param=1.0)([1.2])) ## --> 1.6
+'''
